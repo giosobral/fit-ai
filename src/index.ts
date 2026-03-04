@@ -1,7 +1,10 @@
 import "dotenv/config";
 
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUI from "@fastify/swagger-ui";
 import Fastify from "fastify";
 import {
+  jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   ZodTypeProvider,
@@ -14,6 +17,43 @@ const app = Fastify({
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+await app.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: "Fit AI API",
+      description: "API for Fit AI application",
+      version: "1.0.0",
+    },
+    servers: [
+      {
+        description: "Localhost",
+        url: "http://localhost:3000",
+      },
+    ],
+  },
+  transform: jsonSchemaTransform,
+});
+
+await app.register(fastifySwaggerUI, {
+  routePrefix: "/docs",
+});
+
+const LOGIN_SCHEMA = z.object({
+  username: z.string().max(32).describe("Some description for username"),
+  password: z.string().max(32),
+});
+
+app.after(() => {
+  app.withTypeProvider<ZodTypeProvider>().route({
+    method: "POST",
+    url: "/login",
+    schema: { body: LOGIN_SCHEMA },
+    handler: (req, res) => {
+      res.send("ok");
+    },
+  });
+});
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
