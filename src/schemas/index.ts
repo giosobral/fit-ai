@@ -11,6 +11,22 @@ export const StartWorkoutSessionSchema = z.object({
   userWorkoutSessionId: z.uuid(),
 });
 
+export const GetWorkoutPlanSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  workoutDays: z.array(
+    z.object({
+      id: z.uuid(),
+      weekDay: z.enum(WeekDay),
+      name: z.string(),
+      isRest: z.boolean(),
+      coverImageUrl: z.url().optional(),
+      estimatedDurationInSeconds: z.number(),
+      exercisesCount: z.number(),
+    }),
+  ),
+});
+
 export const UpdateWorkoutSessionSchema = z.object({
   id: z.uuid(),
   startedAt: z.iso.datetime(),
