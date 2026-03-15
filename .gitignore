@@ -5,3 +5,7 @@ node_modules
 
 tasks
 docs
+
+#Build 
+
+./dist
