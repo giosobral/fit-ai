@@ -89,7 +89,7 @@ export const UpdateWorkoutSessionBodySchema = z.object({
 });
 
 export const HomeDataSchema = z.object({
-  activeWorkoutPlanId: z.uuid(),
+  activeWorkoutPlanId: z.uuid().optional(),
   todayWorkoutDay: z
     .object({
       workoutPlanId: z.uuid(),
