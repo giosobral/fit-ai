@@ -25,4 +25,14 @@ export const auth = betterAuth({
       domain: env.NODE_ENV === "production" ? ".devgiosobral.com" : undefined,
     },
   },
+  cookies: {
+    sessionToken: {
+      attributes: {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+      },
+    },
+  },
 });
