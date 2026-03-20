@@ -88,6 +88,25 @@ export const UpdateWorkoutSessionBodySchema = z.object({
   completedAt: z.iso.datetime(),
 });
 
+export const HomeDataQuerySchema = z.object({
+  timezone: z
+    .string()
+    .default("UTC")
+    .refine(
+      (tz) => {
+        try {
+          Intl.DateTimeFormat(undefined, { timeZone: tz });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Invalid timezone",
+      },
+    ),
+});
+
 export const HomeDataSchema = z.object({
   activeWorkoutPlanId: z.uuid().optional(),
   todayWorkoutDay: z
@@ -115,6 +134,22 @@ export const HomeDataSchema = z.object({
 export const StatsQuerySchema = z.object({
   from: z.iso.date(),
   to: z.iso.date(),
+  timezone: z
+    .string()
+    .default("UTC")
+    .refine(
+      (tz) => {
+        try {
+          Intl.DateTimeFormat(undefined, { timeZone: tz });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Invalid timezone",
+      },
+    ),
 });
 
 export const StatsSchema = z.object({

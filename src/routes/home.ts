@@ -5,7 +5,11 @@ import z from "zod";
 
 import { NotFoundError } from "../errors/index.js";
 import { auth } from "../lib/auth.js";
-import { ErrorSchema, HomeDataSchema } from "../schemas/index.js";
+import {
+  ErrorSchema,
+  HomeDataQuerySchema,
+  HomeDataSchema,
+} from "../schemas/index.js";
 import { GetHomeData } from "../usecases/GetHomeData.js";
 
 export const homeRoutes = async (app: FastifyInstance) => {
@@ -19,6 +23,7 @@ export const homeRoutes = async (app: FastifyInstance) => {
       params: z.object({
         date: z.iso.date(),
       }),
+      querystring: HomeDataQuerySchema,
       response: {
         200: HomeDataSchema,
         401: ErrorSchema,

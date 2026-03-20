@@ -19,6 +19,7 @@ const WEEKDAY_MAP: Record<number, string> = {
 interface InputDto {
   userId: string;
   date: string;
+  timezone?: string;
 }
 
 interface OutputDto {
@@ -64,8 +65,13 @@ export class GetHomeData {
       (day) => day.weekDay === todayWeekDay,
     );
 
-    const weekStart = currentDate.day(0).startOf("day");
-    const weekEnd = currentDate.day(6).endOf("day");
+    const weekStart = dto.timezone
+      ? dayjs.utc(dto.date).tz(dto.timezone).day(0).startOf("day")
+      : dayjs.utc(dto.date).day(0).startOf("week");
+
+    const weekEnd = dto.timezone
+      ? dayjs.utc(dto.date).tz(dto.timezone).day(6).endOf("day")
+      : dayjs.utc(dto.date).day(6).endOf("day");
 
     const weekSessions = await prisma.workoutSession.findMany({
       where: {
@@ -73,8 +79,8 @@ export class GetHomeData {
           workoutPlanId: workoutPlan?.id,
         },
         startedAt: {
-          gte: weekStart.toDate(),
-          lte: weekEnd.toDate(),
+          gte: weekStart.subtract(1, "day").toDate(),
+          lte: weekEnd.add(1, "day").toDate(),
         },
       },
     });
@@ -89,7 +95,11 @@ export class GetHomeData {
       const dateKey = day.format("YYYY-MM-DD");
 
       const daySessions = weekSessions.filter(
-        (s) => dayjs.utc(s.startedAt).format("YYYY-MM-DD") === dateKey,
+        (s) =>
+          (dto.timezone
+            ? dayjs.utc(s.startedAt).tz(dto.timezone)
+            : dayjs.utc(s.startedAt)
+          ).format("YYYY-MM-DD") === dateKey,
       );
 
       const workoutDayStarted = daySessions.length > 0;
@@ -137,6 +147,7 @@ export class GetHomeData {
       sessions: Array<{ startedAt: Date; completedAt: Date | null }>;
     }>,
     currentDate: dayjs.Dayjs,
+    timezone?: string,
   ): Promise<number> {
     const planWeekDays = new Set(workoutDays.map((d) => d.weekDay));
     const restWeekDays = new Set(
@@ -152,7 +163,11 @@ export class GetHomeData {
     });
 
     const completedDates = new Set(
-      allSessions.map((s) => dayjs.utc(s.startedAt).format("YYYY-MM-DD")),
+      allSessions.map((s) =>
+        timezone
+          ? dayjs.utc(s.startedAt).tz(timezone).format("YYYY-MM-DD")
+          : dayjs.utc(s.startedAt).format("YYYY-MM-DD"),
+      ),
     );
 
     let streak = 0;

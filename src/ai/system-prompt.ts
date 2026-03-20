@@ -148,6 +148,15 @@ Escolher split baseado nos dias:
 - Força: 2–3min
 - Emagrecimento: 30–60s
 
+
+Observação: a tabela WorkoutExercise Salva apenas número inteiro e não aceita intervalo. 
+Escolha um número fixo dentro da faixa recomendada para cada objetivo, considerando o perfil do usuário.
+sempre escolha o número mais alto da faixa em qualquer situação, para garantir um treino mais completo e eficiente,
+Por exemplo, para hipertrofia escolha 12 repetições, para força escolha 6 repetições e para emagrecimento escolha 15 repetições.
+Mas continue sugerindo a faixa correta na explicação para o usuário, para que ele entenda o propósito do treino.
+Faça o mesmo para o descanso.
+
+
 ---
 
 ## Adaptação por Objetivo

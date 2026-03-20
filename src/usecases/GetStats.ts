@@ -1,10 +1,12 @@
 import dayjs from "dayjs";
+import timezonePlugin from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
 
 import { NotFoundError } from "../errors/index.js";
 import { prisma } from "../lib/db.js";
 
 dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const WEEKDAY_MAP: Record<number, string> = {
   0: "SUNDAY",
@@ -20,6 +22,7 @@ interface InputDto {
   userId: string;
   from: string;
   to: string;
+  timezone?: string;
 }
 
 interface OutputDto {
@@ -38,8 +41,8 @@ interface OutputDto {
 
 export class GetStats {
   async execute(dto: InputDto): Promise<OutputDto> {
-    const fromDate = dayjs.utc(dto.from).startOf("day");
-    const toDate = dayjs.utc(dto.to).endOf("day");
+    const fromDate = dayjs.utc(dto.from).subtract(1, "day").startOf("day");
+    const toDate = dayjs.utc(dto.to).add(1, "day").endOf("day");
 
     const workoutPlan = await prisma.workoutPlan.findFirst({
       where: { userId: dto.userId, isActive: true },
@@ -103,6 +106,7 @@ export class GetStats {
       workoutPlan.id,
       workoutPlan.workoutDays,
       toDate,
+      dto.timezone,
     );
 
     return {
@@ -121,6 +125,7 @@ export class GetStats {
       isRest: boolean;
     }>,
     currentDate: dayjs.Dayjs,
+    timezone?: string,
   ): Promise<number> {
     const planWeekDays = new Set(workoutDays.map((d) => d.weekDay));
     const restWeekDays = new Set(
@@ -136,7 +141,11 @@ export class GetStats {
     });
 
     const completedDates = new Set(
-      allSessions.map((s) => dayjs.utc(s.startedAt).format("YYYY-MM-DD")),
+      allSessions.map((s) =>
+        timezone
+          ? dayjs.utc(s.startedAt).tz(timezone).format("YYYY-MM-DD")
+          : dayjs.utc(s.startedAt).format("YYYY-MM-DD"),
+      ),
     );
 
     let streak = 0;
