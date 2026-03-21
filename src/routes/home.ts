@@ -47,6 +47,7 @@ export const homeRoutes = async (app: FastifyInstance) => {
         const result = await getHomeData.execute({
           userId: session.user.id,
           date: request.params.date,
+          timezone: request.query.timezone,
         });
 
         return reply.status(200).send(result);

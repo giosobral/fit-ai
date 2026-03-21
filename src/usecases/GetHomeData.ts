@@ -1,10 +1,12 @@
 import dayjs from "dayjs";
+import timezonePlugin from "dayjs/plugin/timezone.js";
 import utc from "dayjs/plugin/utc.js";
 
 import { WeekDay } from "../generated/prisma/enums.js";
 import { prisma } from "../lib/db.js";
 
 dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
 
 const WEEKDAY_MAP: Record<number, string> = {
   0: "SUNDAY",
@@ -116,6 +118,7 @@ export class GetHomeData {
         workoutPlan.id,
         workoutPlan.workoutDays,
         currentDate,
+        dto.timezone,
       );
     }
     return {

@@ -75,7 +75,9 @@ export class GetStats {
     > = {};
 
     sessions.forEach((session) => {
-      const dateKey = dayjs.utc(session.startedAt).format("YYYY-MM-DD");
+      const dateKey = dto.timezone
+        ? dayjs.utc(session.startedAt).tz(dto.timezone).format("YYYY-MM-DD")
+        : dayjs.utc(session.startedAt).format("YYYY-MM-DD");
 
       if (!consistencyByDay[dateKey]) {
         consistencyByDay[dateKey] = {
