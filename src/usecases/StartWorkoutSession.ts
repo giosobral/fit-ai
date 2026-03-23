@@ -1,3 +1,6 @@
+import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek.js";
+
 import {
   NotFoundError,
   SessionAlreadyStartedError,
@@ -41,8 +44,14 @@ export class StartWorkoutSession {
       throw new NotFoundError("Workout day not found");
     }
 
+    dayjs.extend(isoWeek);
+    const startOfCurrentWeek = dayjs().startOf("isoWeek").toDate();
+
     const existingSession = await prisma.workoutSession.findFirst({
-      where: { workoutDayId: dto.workoutDayId },
+      where: {
+        workoutDayId: dto.workoutDayId,
+        startedAt: { gte: startOfCurrentWeek },
+      },
     });
 
     if (existingSession) {
